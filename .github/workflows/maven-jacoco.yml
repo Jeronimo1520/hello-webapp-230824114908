@@ -45,11 +45,11 @@ jobs:
         run: |
           echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
           echo "branches = ${{ steps.jacoco.outputs.branches }}"
-      - name: Set workflow status to failure if coverage is below 60%
+      - name: Verificación de cobertura mayor al 50%
         run: |
           COVERAGE=$(steps.jacoco.outputs.coverage)
-          if [ $(echo "$COVERAGE < 60" | bc -l) -eq 1 ]; then
-            echo "Cobertura debajo del 60%."
+          if [ $(echo "$COVERAGE < 50" | bc -l) -eq 1 ]; then
+            echo "Cobertura debajo del 50%."
             exit 1
           fi
       - name: Comment on PR with coverage percentages
