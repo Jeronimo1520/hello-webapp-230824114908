@@ -1,0 +1,39 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ maven ]
+  pull_request:
+    branches: [ maven ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '17' ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{matrix.java}}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{matrix.java}}
+          distribution: 'adopt'
+          cache: maven
+      - name: Build with Maven Wrapper
+        run: ./mvnw -B package
+       # generates coverage-report.md and publishes as checkrun
+      - name: JaCoCo Code Coverage Report
+        id: jacoco_reporter
+        uses: PavanMudigonda/jacoco-reporter@v4.8
+        with:
+          coverage_results_path: ./pom.xml
+          coverage_report_name: Coverage
+          coverage_report_title: JaCoCo
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          skip_check_run: false
+          minimum_coverage: 80
+          fail_below_threshold: true
+          publish_only_summary: false
