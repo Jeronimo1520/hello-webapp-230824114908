@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven jacoco
+name: Workflow con coverage
 
 on:
   push:
@@ -45,13 +45,15 @@ jobs:
         run: |
           echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
           echo "branches = ${{ steps.jacoco.outputs.branches }}"
-      - name: Verificación de cobertura mayor al 50%
+
+      - name: Check coverage percentage 50%
         run: |
-          COVERAGE=$(steps.jacoco.outputs.coverage)
-          if [ $(echo "$COVERAGE < 50" | bc -l) -eq 1 ]; then
-            echo "Cobertura debajo del 50%."
+          COVERAGE=$(echo "${{ steps.jacoco.outputs.coverage }}" | tr -d '%')
+          if [ "$COVERAGE" -lt 50 ]; then
+            echo "Code coverage is below 50%, setting workflow status to failure."
             exit 1
           fi
+
       - name: Comment on PR with coverage percentages
         if: ${{ github.event_name == 'pull_request' }}
         run: |
@@ -69,3 +71,4 @@ jobs:
         run: |
           echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
+
