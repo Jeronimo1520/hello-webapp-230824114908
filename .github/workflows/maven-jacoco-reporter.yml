@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Workflow maven jacoco reporterNof
 
 on:
   push:
