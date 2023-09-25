@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Workflow no-continue-on-error
 
 on:
   push:
