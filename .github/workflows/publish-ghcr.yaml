@@ -1,40 +1,15 @@
 name: Docker Image CI for GHCR
 
 on:
-  push:
-    branches:
-      - maven
-
-jobs:
+   push:
+    branches: [ maven ]
+jobs: 
   build_and_publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set Docker version
-        id: set_version
-        run: |
-          # Custom script to determine the next version
-          VERSION_FILE="version.txt"
-          if [ -f "$VERSION_FILE" ]; then
-            CURRENT_VERSION=$(cat "$VERSION_FILE")
-          else
-            CURRENT_VERSION="0.0"
-          fi
-          # Increment the version
-          MAJOR_VERSION=$(echo "$CURRENT_VERSION" | cut -d. -f1)
-          MINOR_VERSION=$(echo "$CURRENT_VERSION" | cut -d. -f2)
-          NEXT_MINOR_VERSION=$((MINOR_VERSION + 1))
-          NEXT_VERSION="$MAJOR_VERSION.$NEXT_MINOR_VERSION"
-          echo "Docker image version: $NEXT_VERSION"
-          echo "$NEXT_VERSION" > "$VERSION_FILE"
-          echo "::set-output name=docker_version::$NEXT_VERSION"
-        shell: bash
-
+      - uses: actions/checkout@v3
       - name: Build and push the image
         run: |
-          DOCKER_VERSION="${{ steps.set_version.outputs.docker_version }}"
-          docker login --username Jeronimo1520 --password ${{ secrets.GH_PAT }} ghcr.io
-          docker build . -t ghcr.io/jeronimo1520/petclinic-ghcr:$DOCKER_VERSION
-          docker push ghcr.io/jeronimo1520/petclinic-ghcr:$DOCKER_VERSION
+          docker login --username Jeronimo1520 --password ${{secrets.GH_PAT}} ghcr.io
+          docker build . -t ghcr.io/jeronimo1520/petclinic-ghcr:latest
+          docker push ghcr.io/jeronimo1520/petclinic-ghcr:latest
