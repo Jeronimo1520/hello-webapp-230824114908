@@ -14,7 +14,7 @@ jobs:
       - name: Set Docker version
         id: set_version
         run: |
-          # You can use this script to calculate the next version number
+          # Use curl and jq to fetch and process the tags from GHCR
           CURRENT_VERSION=$(curl -s https://ghcr.io/v2/jeronimo1520/petclinic-ghcr/tags/list | jq -r '.tags[]' | grep -E '0\.[0-9]+' | sort -V | tail -n 1)
           if [ -z "$CURRENT_VERSION" ]; then
             NEXT_VERSION="0.1"
@@ -35,4 +35,4 @@ jobs:
           docker push ghcr.io/jeronimo1520/petclinic-ghcr:$DOCKER_VERSION
         env:
           DOCKER_VERSION: ${{ env.DOCKER_VERSION }}
-  
+
