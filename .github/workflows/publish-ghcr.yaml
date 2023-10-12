@@ -1,16 +1,38 @@
 name: Docker Image CI for GHCR
 
 on:
-   push:
-    branches: [ maven ]
-jobs: 
+  push:
+    branches: [maven]
+
+jobs:
   build_and_publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set Docker version
+        id: set_version
+        run: |
+          # You can use this script to calculate the next version number
+          CURRENT_VERSION=$(curl -s https://ghcr.io/v2/jeronimo1520/petclinic-ghcr/tags/list | jq -r '.tags[]' | grep -E '0\.[0-9]+' | sort -V | tail -n 1)
+          if [ -z "$CURRENT_VERSION" ]; then
+            NEXT_VERSION="0.1"
+          else
+            NEXT_VERSION=$(echo $CURRENT_VERSION | awk -F'.' '{print "0." $2+1}')
+          fi
+          echo "Docker image version: $NEXT_VERSION"
+          echo "::set-env name=DOCKER_VERSION::$NEXT_VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+
       - name: Build and push the image
         run: |
-          docker login --username Jeronimo1520 --password ${{secrets.GH_PAT}} ghcr.io
-          docker build . -t ghcr.io/jeronimo1520/petclinic-ghcr:latest
-          docker push ghcr.io/jeronimo1520/petclinic-ghcr:latest
+          docker login --username Jeronimo1520 --password ${{ secrets.GH_PAT }} ghcr.io
+          DOCKER_VERSION=$GITHUB_WORKSPACE/$DOCKER_VERSION
+          docker build . -t ghcr.io/jeronimo1520/petclinic-ghcr:$DOCKER_VERSION
+          docker push ghcr.io/jeronimo1520/petclinic-ghcr:$DOCKER_VERSION
+        env:
+          DOCKER_VERSION: ${{ env.DOCKER_VERSION }}
   
