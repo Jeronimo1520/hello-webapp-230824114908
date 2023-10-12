@@ -14,5 +14,5 @@ jobs:
       - name: Build and push the image
         run: |
           docker login --username Jeronimo1520 --password ${{secrets.GH_PAT}} ghcr.io
-          docker build . -t ghcr.io/jeronimo1520/petclinic-ghcrJYP:v${{ github.run_number }}
-          docker push ghcr.io/jeronimo1520/petclinic-ghcrJYP:v${{ github.run_number }}
+          docker build . -t ghcr.io/jeronimo1520/petclinic-ghcr:v${{ github.run_number }}
+          docker push ghcr.io/jeronimo1520/petclinic-ghcr:v${{ github.run_number }}
